@@ -286,12 +286,7 @@ clone_common() {
 clone_fox_recovery() {
 local URL="";
 local BRANCH=$FOX_BRANCH;
-   if [ "$USE_SSH" = "0" ]; then
-      URL="https://gitlab.com/OrangeFox/bootable/Recovery.git";
-   else
-      URL="git@gitlab.com:OrangeFox/bootable/Recovery.git";
-   fi
-
+   
    mkdir -p $MANIFEST_DIR/bootable;
    [ ! -d $MANIFEST_DIR/bootable ] && {
       echo "-- Invalid directory: $MANIFEST_DIR/bootable";
@@ -306,28 +301,8 @@ local BRANCH=$FOX_BRANCH;
    }
 
    echo "-- Pulling the OrangeFox recovery sources ...";
-   git clone --recurse-submodules $URL -b $BRANCH recovery;
+   git clone https://github.com/Arafattex/OrangeFox_bootable_recovery.git -b $BRANCH recovery;
    [ "$?" = "0" ] && echo "-- The OrangeFox sources have been cloned successfully" || echo "-- Failed to clone the OrangeFox sources!";
-
-   # check that the themes are correctly downloaded
-   if [ ! -f recovery/gui/theme/portrait_hdpi/ui.xml ]; then
-      	echo "-- Themes not found! Trying again to pull the themes ...";
-   	if [ "$USE_SSH" = "0" ]; then
-      	   URL="https://gitlab.com/OrangeFox/misc/theme.git";
-   	else
-      	   URL="git@gitlab.com:OrangeFox/misc/theme.git";
-   	fi
-      	[ -d recovery/gui/theme ] && rm -rf recovery/gui/theme;
-      	git clone $URL recovery/gui/theme;
-      	[ "$?" = "0" ] && echo "-- The themes have been cloned successfully" || echo "-- Failed to clone the themes!";
-   fi
-
-   # ensure that the submodules are updated
-   if [ -d $MANIFEST_DIR/bootable/recovery/gui/theme ]; then
-      cd $MANIFEST_DIR/bootable/recovery/;
-      git submodule foreach --recursive git pull origin master;
-      cd $MANIFEST_DIR/bootable/;
-   fi
 
    # cleanup /tmp/recovery/
    echo  "-- Cleaning up the TWRP recovery sources from /tmp";
